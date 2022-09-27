@@ -8,6 +8,7 @@ import Loading from '../components/Loading';
 import { StatusBar } from 'expo-status-bar';
 import * as Location from "expo-location";
 import axios from "axios"
+import {firebase_db} from "../firebaseConfig"
 
 export default function MainPage({navigation,route}) {
   //useState 사용법
@@ -29,20 +30,26 @@ export default function MainPage({navigation,route}) {
   const [ready,setReady] = useState(true)
 
   useEffect(()=>{
-    navigation.setOptions({
-      title:'나만의 꿀팁'
-    })  
-		//뒤의 1000 숫자는 1초를 뜻함
-    //1초 뒤에 실행되는 코드들이 담겨 있는 함수
-    setTimeout(()=>{
-        //헤더의 타이틀 변경
+    //헤더의 타이틀 변경
+      navigation.setOptions({
+          title:'나만의 꿀팁'
+      })
+      firebase_db.ref('/tip').once('value').then((snapshot) => {
+        console.log("파이어베이스에서 데이터 가져왔습니다!!")
+        let tip = snapshot.val();
+        setState(tip)
+        setCateState(tip)
         getLocation()
-        setState(data.tip)
-        setCateState(data.tip)
         setReady(false)
-    },1000)
- 
-    
+      });
+      // setTimeout(()=>{
+      //     let tip = data.tip;
+      //     setState(tip)
+      //     setCateState(tip)
+      //     getLocation()
+      //     setReady(true)
+      // },1000)
+
   },[])
 
   const getLocation = async () => {
